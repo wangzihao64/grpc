@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package = "/proto";
+//普通rpc，一问一答
+service Simple{
+  rpc Fun(Request)returns(Response){}
+}
+message Request{
+  string name = 1;
+}
+message Response{
+  string text= 1;
+}
+
+service ServiceStream{
+  rpc Fun(Request)returns(stream Response){}
+}

@@ -1,0 +1,22 @@
+syntax = "proto3" ; //指定proto版本
+package hello_grpc; //指定默认报名
+//指定golang报名
+option go_package = "/hello_grpc";
+
+//定义rpc服务器
+service HelloService{
+  //定义函数
+  rpc SayHello (HelloRequest) returns (HelloReponse){}
+}
+
+//HelloRequest请求内容
+message HelloRequest{
+  string name = 1;
+  string message = 2;
+}
+
+//HelloResponse相应内容
+message HelloReponse{
+  string name = 1;
+  string message = 2;
+}

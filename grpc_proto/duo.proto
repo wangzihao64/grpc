@@ -13,3 +13,4 @@ message Response{
 service OrderService{
   rpc Buy(Request)returns(Response){}
 }
+//protoc -I . --go_out=. --go-grpc_out=. duo.proto

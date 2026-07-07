@@ -1,0 +1,12 @@
+syntax = "proto3"; //指定proto版本
+//指定golang包名
+package proto;
+option go_package = "/proto" ;
+
+message Request{
+  string name = 1;
+}
+message Response{
+  string name = 1;
+}
+//protoc -I ./service_proto --go_out=./service_proto --go-grpc_out=./service_proto ./service_proto/*.proto

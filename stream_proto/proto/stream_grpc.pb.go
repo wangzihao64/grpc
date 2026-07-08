@@ -125,27 +125,29 @@ var Simple_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Servicestream_Fun_FullMethodName = "/Servicestream/Fun"
+	ServiceStream_Fun_FullMethodName          = "/ServiceStream/Fun"
+	ServiceStream_DownLoadFile_FullMethodName = "/ServiceStream/DownLoadFile"
 )
 
-// ServicestreamClient is the client API for Servicestream service.
+// ServiceStreamClient is the client API for ServiceStream service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ServicestreamClient interface {
+type ServiceStreamClient interface {
 	Fun(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error)
+	DownLoadFile(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileResponse], error)
 }
 
-type servicestreamClient struct {
+type serviceStreamClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewServicestreamClient(cc grpc.ClientConnInterface) ServicestreamClient {
-	return &servicestreamClient{cc}
+func NewServiceStreamClient(cc grpc.ClientConnInterface) ServiceStreamClient {
+	return &serviceStreamClient{cc}
 }
 
-func (c *servicestreamClient) Fun(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error) {
+func (c *serviceStreamClient) Fun(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Response], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &Servicestream_ServiceDesc.Streams[0], Servicestream_Fun_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ServiceStream_ServiceDesc.Streams[0], ServiceStream_Fun_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,69 +162,108 @@ func (c *servicestreamClient) Fun(ctx context.Context, in *Request, opts ...grpc
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Servicestream_FunClient = grpc.ServerStreamingClient[Response]
+type ServiceStream_FunClient = grpc.ServerStreamingClient[Response]
 
-// ServicestreamServer is the server API for Servicestream service.
-// All implementations must embed UnimplementedServicestreamServer
-// for forward compatibility.
-type ServicestreamServer interface {
-	Fun(*Request, grpc.ServerStreamingServer[Response]) error
-	mustEmbedUnimplementedServicestreamServer()
+func (c *serviceStreamClient) DownLoadFile(ctx context.Context, in *Request, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ServiceStream_ServiceDesc.Streams[1], ServiceStream_DownLoadFile_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[Request, FileResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
 }
 
-// UnimplementedServicestreamServer must be embedded to have
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ServiceStream_DownLoadFileClient = grpc.ServerStreamingClient[FileResponse]
+
+// ServiceStreamServer is the server API for ServiceStream service.
+// All implementations must embed UnimplementedServiceStreamServer
+// for forward compatibility.
+type ServiceStreamServer interface {
+	Fun(*Request, grpc.ServerStreamingServer[Response]) error
+	DownLoadFile(*Request, grpc.ServerStreamingServer[FileResponse]) error
+	mustEmbedUnimplementedServiceStreamServer()
+}
+
+// UnimplementedServiceStreamServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedServicestreamServer struct{}
+type UnimplementedServiceStreamServer struct{}
 
-func (UnimplementedServicestreamServer) Fun(*Request, grpc.ServerStreamingServer[Response]) error {
+func (UnimplementedServiceStreamServer) Fun(*Request, grpc.ServerStreamingServer[Response]) error {
 	return status.Error(codes.Unimplemented, "method Fun not implemented")
 }
-func (UnimplementedServicestreamServer) mustEmbedUnimplementedServicestreamServer() {}
-func (UnimplementedServicestreamServer) testEmbeddedByValue()                       {}
+func (UnimplementedServiceStreamServer) DownLoadFile(*Request, grpc.ServerStreamingServer[FileResponse]) error {
+	return status.Error(codes.Unimplemented, "method DownLoadFile not implemented")
+}
+func (UnimplementedServiceStreamServer) mustEmbedUnimplementedServiceStreamServer() {}
+func (UnimplementedServiceStreamServer) testEmbeddedByValue()                       {}
 
-// UnsafeServicestreamServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ServicestreamServer will
+// UnsafeServiceStreamServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to ServiceStreamServer will
 // result in compilation errors.
-type UnsafeServicestreamServer interface {
-	mustEmbedUnimplementedServicestreamServer()
+type UnsafeServiceStreamServer interface {
+	mustEmbedUnimplementedServiceStreamServer()
 }
 
-func RegisterServicestreamServer(s grpc.ServiceRegistrar, srv ServicestreamServer) {
-	// If the following call panics, it indicates UnimplementedServicestreamServer was
+func RegisterServiceStreamServer(s grpc.ServiceRegistrar, srv ServiceStreamServer) {
+	// If the following call panics, it indicates UnimplementedServiceStreamServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Servicestream_ServiceDesc, srv)
+	s.RegisterService(&ServiceStream_ServiceDesc, srv)
 }
 
-func _Servicestream_Fun_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _ServiceStream_Fun_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Request)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(ServicestreamServer).Fun(m, &grpc.GenericServerStream[Request, Response]{ServerStream: stream})
+	return srv.(ServiceStreamServer).Fun(m, &grpc.GenericServerStream[Request, Response]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type Servicestream_FunServer = grpc.ServerStreamingServer[Response]
+type ServiceStream_FunServer = grpc.ServerStreamingServer[Response]
 
-// Servicestream_ServiceDesc is the grpc.ServiceDesc for Servicestream service.
+func _ServiceStream_DownLoadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Request)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ServiceStreamServer).DownLoadFile(m, &grpc.GenericServerStream[Request, FileResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ServiceStream_DownLoadFileServer = grpc.ServerStreamingServer[FileResponse]
+
+// ServiceStream_ServiceDesc is the grpc.ServiceDesc for ServiceStream service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Servicestream_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Servicestream",
-	HandlerType: (*ServicestreamServer)(nil),
+var ServiceStream_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "ServiceStream",
+	HandlerType: (*ServiceStreamServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Fun",
-			Handler:       _Servicestream_Fun_Handler,
+			Handler:       _ServiceStream_Fun_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "DownLoadFile",
+			Handler:       _ServiceStream_DownLoadFile_Handler,
 			ServerStreams: true,
 		},
 	},

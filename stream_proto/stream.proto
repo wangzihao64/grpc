@@ -25,5 +25,7 @@ message FileRequest{
 service Clientstream{
   rpc UploadFile(stream FileRequest)returns(Response){}
 }
-
+service BothStream{
+  rpc ChatStream(stream Request)returns(stream Response){}
+}
 //protoc -I . --go_out=. --go-grpc_out=. stream.proto

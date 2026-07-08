@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"grpcdemo/stream_proto/proto"
 	"io"
 	"log"
+	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -21,19 +23,36 @@ func main() {
 	}
 	defer conn.Close()
 	//初始化客户端
-	client := proto.NewServicestreamClient(conn)
-	stream, err := client.Fun(context.Background(), &proto.Request{
-		Name: "张三",
-	})
-	//for i := 0; i < 10; i++ {
-	//	response, err := stream.Recv()
-	//	fmt.Println(response, err)
+	client := proto.NewServiceStreamClient(conn)
+	//stream, err := client.Fun(context.Background(), &proto.Request{
+	//	Name: "张三",
+	//})
+	////for i := 0; i < 10; i++ {
+	////	response, err := stream.Recv()
+	////	fmt.Println(response, err)
+	////}
+	//for {
+	//	resp, err := stream.Recv()
+	//	if err == io.EOF {
+	//		break
+	//	}
+	//	fmt.Println(resp, err)
 	//}
+	stream, err := client.DownLoadFile(context.Background(), &proto.Request{
+		Name: "wangzihao",
+	})
+	file, err := os.OpenFile("static/1.pdf", os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer file.Close()
+	writer := bufio.NewWriter(file)
 	for {
-		resp, err := stream.Recv()
+		response, err := stream.Recv()
 		if err == io.EOF {
 			break
 		}
-		fmt.Println(resp, err)
+		writer.Write(response.Content)
 	}
+	writer.Flush()
 }

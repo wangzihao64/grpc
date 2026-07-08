@@ -161,6 +161,58 @@ func (x *FileResponse) GetContent() []byte {
 	return nil
 }
 
+type FileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileName      string                 `protobuf:"bytes,1,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileRequest) Reset() {
+	*x = FileRequest{}
+	mi := &file_stream_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileRequest) ProtoMessage() {}
+
+func (x *FileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_stream_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileRequest.ProtoReflect.Descriptor instead.
+func (*FileRequest) Descriptor() ([]byte, []int) {
+	return file_stream_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *FileRequest) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *FileRequest) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
 var File_stream_proto protoreflect.FileDescriptor
 
 const file_stream_proto_rawDesc = "" +
@@ -172,12 +224,18 @@ const file_stream_proto_rawDesc = "" +
 	"\x04text\x18\x01 \x01(\tR\x04text\"E\n" +
 	"\fFileResponse\x12\x1b\n" +
 	"\tfile_name\x18\x01 \x01(\tR\bfileName\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\fR\acontent\"D\n" +
+	"\vFileRequest\x12\x1b\n" +
+	"\tfile_name\x18\x01 \x01(\tR\bfileName\x12\x18\n" +
 	"\acontent\x18\x02 \x01(\fR\acontent2&\n" +
 	"\x06Simple\x12\x1c\n" +
 	"\x03Fun\x12\b.Request\x1a\t.Response\"\x002\\\n" +
 	"\rServiceStream\x12\x1e\n" +
 	"\x03Fun\x12\b.Request\x1a\t.Response\"\x000\x01\x12+\n" +
-	"\fDownLoadFile\x12\b.Request\x1a\r.FileResponse\"\x000\x01B\bZ\x06/protob\x06proto3"
+	"\fDownLoadFile\x12\b.Request\x1a\r.FileResponse\"\x000\x0129\n" +
+	"\fClientstream\x12)\n" +
+	"\n" +
+	"UploadFile\x12\f.FileRequest\x1a\t.Response\"\x00(\x01B\bZ\x06/protob\x06proto3"
 
 var (
 	file_stream_proto_rawDescOnce sync.Once
@@ -191,21 +249,24 @@ func file_stream_proto_rawDescGZIP() []byte {
 	return file_stream_proto_rawDescData
 }
 
-var file_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_stream_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_stream_proto_goTypes = []any{
 	(*Request)(nil),      // 0: Request
 	(*Response)(nil),     // 1: Response
 	(*FileResponse)(nil), // 2: FileResponse
+	(*FileRequest)(nil),  // 3: FileRequest
 }
 var file_stream_proto_depIdxs = []int32{
 	0, // 0: Simple.Fun:input_type -> Request
 	0, // 1: ServiceStream.Fun:input_type -> Request
 	0, // 2: ServiceStream.DownLoadFile:input_type -> Request
-	1, // 3: Simple.Fun:output_type -> Response
-	1, // 4: ServiceStream.Fun:output_type -> Response
-	2, // 5: ServiceStream.DownLoadFile:output_type -> FileResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	3, // 3: Clientstream.UploadFile:input_type -> FileRequest
+	1, // 4: Simple.Fun:output_type -> Response
+	1, // 5: ServiceStream.Fun:output_type -> Response
+	2, // 6: ServiceStream.DownLoadFile:output_type -> FileResponse
+	1, // 7: Clientstream.UploadFile:output_type -> Response
+	4, // [4:8] is the sub-list for method output_type
+	0, // [0:4] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -222,9 +283,9 @@ func file_stream_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_stream_proto_rawDesc), len(file_stream_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   4,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   3,
 		},
 		GoTypes:           file_stream_proto_goTypes,
 		DependencyIndexes: file_stream_proto_depIdxs,
